@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Sweeper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black min-h-screen flex flex-col place-items-center justify-center">
+
+    <pre id="ascii-title" class="text-green-500 bg-black pb-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
+
+    <div id="login-container" class="w-full max-w-sm flex flex-col gap-6 place-items-center opacity-0 transition-opacity duration-700">
+        
+        <form action="" method="POST" class="w-full flex flex-col gap-5 text-left font-mono">
+            
+            <div class="flex flex-col gap-1">
+                <label for="username" class="text-green-500 text-xs tracking-widest font-bold">
+                    &gt; USER_ID:
+                </label>
+                <div class="relative flex items-center">
+                    <span class="absolute left-3 text-green-500 select-none">@</span>
+                    <input type="text" id="username" name="username" required autocomplete="off"
+                        class="w-full bg-black text-green-400 border-2 border-green-500 pl-8 pr-3 py-2 text-sm font-mono
+                               shadow-[0_0_10px_rgba(34,197,94,0.5)]
+                               outline-none focus:border-green-300 focus:shadow-[0_0_12px_rgba(34,197,94,0.6)] 
+                               placeholder-green-800 transition-all"
+                        placeholder="guest_player">
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label for="password" class="text-green-500 text-xs tracking-widest font-bold">
+                    &gt; ACCESS_PASSCODE:
+                </label>
+                <div class="relative flex items-center">
+                    <span class="absolute left-3 text-green-500 select-none">$</span>
+                    <input type="password" id="password" name="password" required
+                        class="w-full bg-black text-green-400 border-2 border-green-500 pl-8 pr-3 py-2 text-sm font-mono
+                               shadow-[0_0_10px_rgba(34,197,94,0.5)]
+                               outline-none focus:border-green-300 focus:shadow-[0_0_12px_rgba(34,197,94,0.6)] 
+                               placeholder-green-800 transition-all"
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <button type="submit" 
+                class="font-mono text-green-500 bg-black border-2 border-green-500 mt-2 py-2.5 font-bold uppercase tracking-widest 
+                       shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all hover:bg-green-500 hover:text-black 
+                       active:translate-y-0.5 focus:outline-none cursor-pointer">
+                [ AUTHENTICATE ]
+            </button>
+        </form>
+
+        <div class="flex justify-between w-full text-xs font-mono text-green-600 px-1">
+            <a href="" class="hover:text-green-400 hover:underline">&gt; CREATE_ACCOUNT</a>
+            <a href="" class="hover:text-green-400 hover:underline">&gt; GUEST_MODE</a>
+        </div>
+
+    </div>
+
+    <script>
+        const asciiArt = `
+        █████          ███████      █████████  █████ ██████   █████
+        ░███         ███░░░░░███   ███░░░░░███░░███ ░░██████ ░░███ 
+        ░███        ███     ░░███ ███     ░░░  ░███  ░███░███ ░███ 
+        ░███       ░███      ░███░███          ░███  ░███░░███░███ 
+        ░███       ░███      ░███░███    █████ ░███  ░███ ░░██████ 
+        ░███      █░░███     ███ ░░███  ░░███  ░███  ░███  ░░█████ 
+        ███████████ ░░░███████░   ░░█████████  █████ █████  ░░█████
+        ░░░░░░░░░░░    ░░░░░░░      ░░░░░░░░░  ░░░░░ ░░░░░    ░░░░░    `;
+
+        const lines = asciiArt.split('\n');
+        const titleContainer = document.getElementById('ascii-title');
+        const loginContainer = document.getElementById('login-container');
+        
+        let currentLine = 0;
+        const lineDelay = 65; // Speed per line (ms)
+
+        function printLine() {
+            if (currentLine < lines.length) {
+                titleContainer.textContent += lines[currentLine] + '\n';
+                currentLine++;
+                setTimeout(printLine, lineDelay);
+            } else {
+                // Reveal the form after ASCII art prints
+                loginContainer.classList.remove('opacity-0');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', printLine);
+    </script>
+</body>
+</html>

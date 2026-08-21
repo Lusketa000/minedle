@@ -1,1 +1,54 @@
-teste
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Sweeper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black min-h-screen flex flex-col place-items-center justify-center">
+    
+    <pre id="ascii-title" class="text-green-500 bg-black pb-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
+
+    <div id="menu-buttons" class="flex flex-col gap-10 place-items-center opacity-0 transition-opacity duration-700">
+        <a href="" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider 
+                        shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all hover:bg-green-500 hover:text-black active:translate-y-0.5 focus:outline-none">
+            [ START GAME ]
+        </a>
+        <a href="" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider 
+                        shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all hover:bg-green-500 hover:text-black active:translate-y-0.5 focus:outline-none">
+            [ PLAY THE LAST ONE ]
+        </a>
+    </div>
+
+    <script>
+        const asciiArt = `
+        ██████████     █████████   █████ █████       █████ █████     █████████  █████   ███   █████ ██████████ ██████████ ███████████  ██████████ ███████████     
+        ░███░░░░███   ███░░░░░███ ░░███ ░░███       ░░███ ░░███     ███░░░░░███░░███   ░███  ░░███ ░░███░░░░░█░░███░░░░░█░░███░░░░░███░░███░░░░░█░░███░░░░░███    
+        ░███   ░░███ ░███    ░███  ░███  ░███        ░░███ ███     ░███    ░░░  ░███   ░███   ░███  ░███  █ ░  ░███  █ ░  ░███    ░███ ░███  █ ░  ░███    ░███    
+        ░███    ░███ ░███████████  ░███  ░███         ░░█████      ░░█████████  ░███   ░███   ░███  ░██████    ░██████    ░██████████  ░██████    ░██████████     
+        ░███    ░███ ░███░░░░░███  ░███  ░███          ░░███        ░░░░░░░░███ ░░███  █████  ███   ░███░░█    ░███░░█    ░███░░░░░░   ░███░░█    ░███░░░░░███    
+        ░███    ███  ░███    ░███  ░███  ░███      █    ░███        ███    ░███  ░░░█████░█████░    ░███ ░   █ ░███ ░   █ ░███         ░███ ░   █ ░███    ░███    
+        ██████████   █████   █████ █████ ███████████    █████      ░░█████████     ░░███ ░░███      ██████████ ██████████ █████        ██████████ █████   █████   
+        ░░░░░░░░░░   ░░░░░   ░░░░░ ░░░░░ ░░░░░░░░░░░    ░░░░░        ░░░░░░░░░       ░░░   ░░░      ░░░░░░░░░░ ░░░░░░░░░░ ░░░░░        ░░░░░░░░░░ ░░░░░   ░░░░░    `;
+
+        const lines = asciiArt.split('\n');
+        const titleContainer = document.getElementById('ascii-title');
+        const buttonsContainer = document.getElementById('menu-buttons');
+        
+        let currentLine = 0;
+        const lineDelay = 70;
+
+        function printLine() {
+            if (currentLine < lines.length) {
+                titleContainer.textContent += lines[currentLine] + '\n';
+                currentLine++;
+                setTimeout(printLine, lineDelay);
+            } else {
+                buttonsContainer.classList.remove('opacity-0');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', printLine);
+    </script>
+</body>
+</html>

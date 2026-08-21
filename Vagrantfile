@@ -97,7 +97,16 @@ Vagrant.configure("2") do |config|
             end
         client.vm.provision "shell", inline: <<-SHELL
             sudo apt-get -y update
-            # instalar mysql
+            apt-get install -y net-tools mysql-server
+            sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf
+            systemctl restart mysql
+
+            if [ -f /vagrant/init.sql ]; then
+                mysql < /vagrant/init.sql
+                echo "Database carregado"
+            else
+                echo "sql não encontrado"
+            fi
 
         SHELL
     end
