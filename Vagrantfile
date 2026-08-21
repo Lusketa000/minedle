@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
             apt-get update
             apt-get install -y nginx
 
-            cp /vagrant/vm1/nginx/nginx.conf \
+            cp /vagrant/reverse-proxy/nginx/nginx.conf \
             /etc/nginx/sites-available/site.conf
 
             chmod 644 /etc/nginx/sites-available/site.conf
@@ -44,10 +44,10 @@ Vagrant.configure("2") do |config|
 
             # Frontend
             mkdir -p /var/www/frontend
-            cp -r /vagrant/vm2/frontend/. /var/www/frontend/
+            cp -r /vagrant/frontend/app/. /var/www/frontend/
 
             # Nginx
-            cp /vagrant/vm2/nginx/nginx.conf \
+            cp /vagrant/frontend/nginx/nginx.conf \
             /etc/nginx/sites-available/site.conf
 
             chmod 644 /etc/nginx/sites-available/site.conf
@@ -73,8 +73,15 @@ Vagrant.configure("2") do |config|
             vb.name = "backend"
             end
         client.vm.provision "shell", inline: <<-SHELL
-            sudo apt-get -y update
-            # instalar node e fastify
+            apt-get -y update
+            apt-get install -y net-tools nodejs npm
+
+            # Backend
+            mkdir -p /var/www/backend
+            cp -r /vagrant/backend/. /var/www/backend/
+            
+            cd /var/www/backend
+            npm install fastify
 
         SHELL
     end
