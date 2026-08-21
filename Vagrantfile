@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
             apt-get update
             apt-get install -y nginx
 
-            cp /vagrant/vm1/nginx.conf \
+            cp /vagrant/vm1/nginx/nginx.conf \
             /etc/nginx/sites-available/site.conf
 
             chmod 644 /etc/nginx/sites-available/site.conf
@@ -39,9 +39,27 @@ Vagrant.configure("2") do |config|
             vb.name = "frontend"
             end
         client.vm.provision "shell", inline: <<-SHELL
-            sudo apt-get -y update
-            sudo apt-get install -y net-tools nginx
+            apt-get update
+            apt-get install -y nginx
 
+            # Frontend
+            mkdir -p /var/www/frontend
+            cp -r /vagrant/vm2/frontend/. /var/www/frontend/
+
+            # Nginx
+            cp /vagrant/vm2/nginx/nginx.conf \
+            /etc/nginx/sites-available/site.conf
+
+            chmod 644 /etc/nginx/sites-available/site.conf
+
+            rm -f /etc/nginx/sites-enabled/default
+
+            ln -sf /etc/nginx/sites-available/site.conf \
+                /etc/nginx/sites-enabled/site.conf
+
+            nginx -t
+            systemctl enable nginx
+            systemctl restart nginx
         SHELL
     end
 
