@@ -1,0 +1,9 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "fastify": "^4.26.0",
+    "mysql2": "^3.9.0"
+  }
+}

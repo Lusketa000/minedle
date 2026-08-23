@@ -1,4 +1,5 @@
 Vagrant.configure("2") do |config|
+    config.vm.boot_timeout = 600
     config.vm.define "reverse-proxy" do |client|
         client.vm.box = "bento/ubuntu-26.04"
         client.vm.hostname = "reverse-proxy"
@@ -74,14 +75,23 @@ Vagrant.configure("2") do |config|
             end
         client.vm.provision "shell", inline: <<-SHELL
             apt-get -y update
-            apt-get install -y net-tools nodejs npm
+            apt-get install -y net-tools curl
+            curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+            apt-get install -y nodejs
 
             # Backend
             mkdir -p /var/www/backend
             cp -r /vagrant/backend/. /var/www/backend/
             
             cd /var/www/backend
-            npm install fastify
+            npm install
+
+            # Systemd
+            cp /vagrant/backend/systemd/backend.service /etc/systemd/system/backend.service
+
+            systemctl daemon-reload
+            systemctl enable backend
+            systemctl restart backend
 
         SHELL
     end
@@ -96,7 +106,7 @@ Vagrant.configure("2") do |config|
             vb.name = "database"
             end
         client.vm.provision "shell", inline: <<-SHELL
-            sudo apt-get -y update
+            apt-get -y update
             apt-get install -y net-tools mysql-server
             sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf
             systemctl restart mysql
