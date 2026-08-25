@@ -1,11 +1,16 @@
 Vagrant.configure("2") do |config|
     config.vm.boot_timeout = 600
     config.vm.define "reverse-proxy" do |client|
-        client.vm.box = "bento/ubuntu-26.04"
+        client.vm.box = "ubuntu/focal64"
         client.vm.hostname = "reverse-proxy"
         client.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "0.0.0.0"
         client.vm.network "private_network", ip: "10.20.30.1", netmask: "255.255.255.0", virtualbox__intnet: "intnet1"
         client.vm.provider "virtualbox" do |vb|
+            #vb.customize ["modifyvm", :id, "--appendconfig", "nopti nospectre_v2 nospectre_v1 irqpoll"]
+			#vb.customize ["storagectl", :id, "--name", "SATA Controller", "--hostiocache", "on"]
+			vb.customize ["modifyvm", :id, "--ioapic", "on"]
+			vb.customize ["modifyvm", :id, "--paravirt-provider", "hyperv"]
+            vb.gui = true
             vb.memory = "1024"
             vb.cpus = 1
             vb.name = "reverse-proxy"
@@ -31,10 +36,15 @@ Vagrant.configure("2") do |config|
     end
 
     config.vm.define "frontend" do |client|
-        client.vm.box = "bento/ubuntu-26.04"
+        client.vm.box = "ubuntu/focal64"
         client.vm.hostname = "frontend"
         client.vm.network "private_network", ip: "10.20.30.2", netmask: "255.255.255.0", virtualbox__intnet: "intnet1"
         client.vm.provider "virtualbox" do |vb|
+            #vb.customize ["modifyvm", :id, "--appendconfig", "nopti nospectre_v2 nospectre_v1 irqpoll"]
+			#vb.customize ["storagectl", :id, "--name", "SATA Controller", "--hostiocache", "on"]
+			vb.customize ["modifyvm", :id, "--ioapic", "on"]
+			vb.customize ["modifyvm", :id, "--paravirt-provider", "hyperv"]
+            vb.gui = true
             vb.memory = "1024"
             vb.cpus = 1
             vb.name = "frontend"
@@ -65,10 +75,15 @@ Vagrant.configure("2") do |config|
     end
 
     config.vm.define "backend" do |client|
-        client.vm.box = "bento/ubuntu-26.04"
+        client.vm.box = "ubuntu/focal64"
         client.vm.hostname = "backend"
         client.vm.network "private_network", ip: "10.20.30.3", netmask: "255.255.255.0", virtualbox__intnet: "intnet1"
         client.vm.provider "virtualbox" do |vb|
+            #vb.customize ["modifyvm", :id, "--appendconfig", "nopti nospectre_v2 nospectre_v1 irqpoll"]
+			#vb.customize ["storagectl", :id, "--name", "SATA Controller", "--hostiocache", "on"]
+			vb.customize ["modifyvm", :id, "--ioapic", "on"]
+			vb.customize ["modifyvm", :id, "--paravirt-provider", "hyperv"]
+            vb.gui = true
             vb.memory = "1024"
             vb.cpus = 1
             vb.name = "backend"
@@ -97,10 +112,15 @@ Vagrant.configure("2") do |config|
     end
 
     config.vm.define "database" do |client|
-        client.vm.box = "bento/ubuntu-26.04"
+        client.vm.box = "ubuntu/focal64"
         client.vm.hostname = "database"
         client.vm.network "private_network", ip: "10.20.30.4", netmask: "255.255.255.0", virtualbox__intnet: "intnet1"
         client.vm.provider "virtualbox" do |vb|
+            #vb.customize ["modifyvm", :id, "--appendconfig", "nopti nospectre_v2 nospectre_v1 irqpoll"]
+			#vb.customize ["storagectl", :id, "--name", "SATA Controller", "--hostiocache", "on"]
+			vb.customize ["modifyvm", :id, "--ioapic", "on"]
+			vb.customize ["modifyvm", :id, "--paravirt-provider", "hyperv"]
+            vb.gui = true
             vb.memory = "1024"
             vb.cpus = 1
             vb.name = "database"
