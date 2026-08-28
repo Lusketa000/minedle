@@ -7,48 +7,53 @@
 </head>
 <body class="bg-black min-h-screen flex flex-col place-items-center justify-center">
     
-    <pre id="ascii-title" class="text-green-500 bg-black pb-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
+    <!--Tela do Menu-->
+    <section id="view-menu" class="flex flex-col place-items-center justify-center">
+        <pre id="ascii-title-menu" class="text-green-500 bg-black pb-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
 
-    <div id="menu-buttons" class="flex flex-col gap-10 place-items-center opacity-0 transition-opacity duration-700">
-        <a href="" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider 
+        <div id="menu-buttons" class="flex flex-col gap-10 place-items-center opacity-0 transition-opacity duration-700">
+            <button onclick="navigateTo('view-game')" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider 
                         shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all hover:bg-green-500 hover:text-black active:translate-y-0.5 focus:outline-none">
-            [ START GAME ]
-        </a>
-        <a href="" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider 
+                    [ START GAME ]
+            </button>
+            <button onclick="navigateTo('view-history')" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider 
                         shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all hover:bg-green-500 hover:text-black active:translate-y-0.5 focus:outline-none">
-            [ PLAY THE LAST ONE ]
-        </a>
-    </div>
+                    [ GAME HISTORY ]
+            </button>
+        </div>
+    </section>
 
-    <script>
-        const asciiArt = `
-        ██████████     █████████   █████ █████       █████ █████     █████████  █████   ███   █████ ██████████ ██████████ ███████████  ██████████ ███████████     
-        ░███░░░░███   ███░░░░░███ ░░███ ░░███       ░░███ ░░███     ███░░░░░███░░███   ░███  ░░███ ░░███░░░░░█░░███░░░░░█░░███░░░░░███░░███░░░░░█░░███░░░░░███    
-        ░███   ░░███ ░███    ░███  ░███  ░███        ░░███ ███     ░███    ░░░  ░███   ░███   ░███  ░███  █ ░  ░███  █ ░  ░███    ░███ ░███  █ ░  ░███    ░███    
-        ░███    ░███ ░███████████  ░███  ░███         ░░█████      ░░█████████  ░███   ░███   ░███  ░██████    ░██████    ░██████████  ░██████    ░██████████     
-        ░███    ░███ ░███░░░░░███  ░███  ░███          ░░███        ░░░░░░░░███ ░░███  █████  ███   ░███░░█    ░███░░█    ░███░░░░░░   ░███░░█    ░███░░░░░███    
-        ░███    ███  ░███    ░███  ░███  ░███      █    ░███        ███    ░███  ░░░█████░█████░    ░███ ░   █ ░███ ░   █ ░███         ░███ ░   █ ░███    ░███    
-        ██████████   █████   █████ █████ ███████████    █████      ░░█████████     ░░███ ░░███      ██████████ ██████████ █████        ██████████ █████   █████   
-        ░░░░░░░░░░   ░░░░░   ░░░░░ ░░░░░ ░░░░░░░░░░░    ░░░░░        ░░░░░░░░░       ░░░   ░░░      ░░░░░░░░░░ ░░░░░░░░░░ ░░░░░        ░░░░░░░░░░ ░░░░░   ░░░░░    `;
+    <!--Tela do Jogo-->
+    <section id="view-game" class="hidden flex flex-col items-center gap-6">
+        <div class="flex justify-between w-full border-b border-green-500/30 pb-2">
+            <button onclick="navigateTo('view-menu')" class="border border-green-500 px-3 py-1 text-xs font-mono text-green-500 hover:bg-green-500 hover:text-black transition">
+                &lt; MAIN_MENU
+            </button>
+        </div>
+        <div id="board" class="grid gap-1 p-3 border-2 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)] bg-black select-none"></div>
+    </section>
 
-        const lines = asciiArt.split('\n');
-        const titleContainer = document.getElementById('ascii-title');
-        const buttonsContainer = document.getElementById('menu-buttons');
+    <!--Tela do Histórico de Jogos-->
+    <section id="view-history" class="hidden flex-col placeitems-center justify-center">
+        <pre id="ascii-title-history" class="text-green-500 bg-black pb-20 mt-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
         
-        let currentLine = 0;
-        const lineDelay = 70;
+        <div id="history-buttons" class="size-full max-w-6xl max-h-4xl flex flex-col place-items-center pb-4 opacity-0 transition-opacity duration-700">
+            <div class="w-full h-screen grid gap-6 shadow-[0_0_10px_rgba(34,197,94,0.5)] border-2 border-green-500">
+                <!--Últimos Jogos -->
+            </div>
+            <div class="flex justify-between w-full text-xs font-mono text-green-600 px-1 py-4">
+                <button onclick="navigateTo('view-game')" class="hover:text-green-400 hover:underline">
+                    &gt; PLAY_DAILY_GAME
+                </button>
+                <button onclick="navigateTo('view-menu')" class="hover:text-green-400 hover:underline">
+                    &gt; RETURN_TO_MENU
+                </button>
+            </div>
+        </div>
+    </section>
 
-        function printLine() {
-            if (currentLine < lines.length) {
-                titleContainer.textContent += lines[currentLine] + '\n';
-                currentLine++;
-                setTimeout(printLine, lineDelay);
-            } else {
-                buttonsContainer.classList.remove('opacity-0');
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', printLine);
-    </script>
+    <script src="./js/ascii.js"></script>
+    <script src="./js/game.js"></script>
+    <script src="./js/router.js"></script>
 </body>
 </html>
