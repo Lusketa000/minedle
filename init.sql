@@ -5,23 +5,14 @@ CREATE USER IF NOT EXISTS 'app_user'@'%' IDENTIFIED BY 'senha123';
 GRANT ALL PRIVILEGES ON app_db.* TO 'app_user'@'%';
 FLUSH PRIVILEGES;
 
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL);
-
 CREATE TABLE IF NOT EXISTS tabuleiros (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    dia DATE NOT NULL UNIQUE,
-    seed VARCHAR(100) NOT NULL);
+    dia DATE NOT NULL,
+    seed INT NOT NULL);
 
-CREATE TABLE IF NOT EXISTS jogos (
+CREATE TABLE IF NOT EXISTS placares (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    users_id INT NOT NULL,
+    nome VARCHAR(50) NOT NULL,
     tabuleiros_id INT NOT NULL,
-    tempo_gasto INT NOT NULL,
-    FOREIGN KEY (users_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (tabuleiros_id) REFERENCES tabuleiros(id) ON DELETE CASCADE,
-    CONSTRAINT unique_user_per_board UNIQUE (users_id, tabuleiros_id)
-);
+    tempo_gasto DECIMAL(4, 2) UNSIGNED NOT NULL,
+    FOREIGN KEY (tabuleiros_id) REFERENCES tabuleiros(id) ON DELETE CASCADE);
