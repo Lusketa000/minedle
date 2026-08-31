@@ -1,4 +1,4 @@
-const VIEWS = ['view-menu', 'view-game', 'view-history']
+const VIEWS = ['view-menu', 'view-game', 'view-history', 'view-leaderboard'];
 
 function navigateTo(viewId) {
     VIEWS.forEach(id => {
@@ -18,6 +18,12 @@ function navigateTo(viewId) {
 
     if (viewId === 'view-history' && typeof typeWriter === 'function') {
         typeWriter('ascii-title-history', ASCII_ART.history, 'history-buttons');
+    }
+    if (viewId === 'view-leaderboard') {
+        if (typeof loadLeaderboard === 'function') loadLeaderboard();
+        if (typeof typeWriter === 'function') {
+            typeWriter('ascii-title-leaderboard', ASCII_ART.leaderboard, 'leaderboard-buttons');
+        }
     }
 }
 

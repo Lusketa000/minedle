@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS placares (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     tabuleiros_id INT NOT NULL,
-    tempo_gasto DECIMAL(4, 2) UNSIGNED NOT NULL,
+    tempo_gasto DECIMAL(5, 2) UNSIGNED NOT NULL,
     FOREIGN KEY (tabuleiros_id) REFERENCES tabuleiros(id) ON DELETE CASCADE);

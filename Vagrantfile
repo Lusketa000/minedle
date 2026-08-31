@@ -131,8 +131,8 @@ Vagrant.configure("2") do |config|
             sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf
             systemctl restart mysql
 
-            if [ -f /vagrant/init.sql ]; then
-                mysql < /vagrant/init.sql
+            if [ -f /vagrant/database/init.sql ]; then
+                mysql < /vagrant/database/init.sql
                 echo "Database carregado"
             else
                 echo "sql não encontrado"

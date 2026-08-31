@@ -20,23 +20,26 @@
                         shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all hover:bg-green-500 hover:text-black active:translate-y-0.5 focus:outline-none">
                     [ GAME HISTORY ]
             </button>
+            <button onclick="navigateTo('view-leaderboard')" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all hover:bg-green-500 hover:text-black active:translate-y-0.5 focus:outline-none">
+                [ LEADERBOARD ]
+            </button>
         </div>
     </section>
 
     <!--Tela do Jogo-->
-    <section id="view-game" class="hidden flex flex-col items-center gap-6">
-        <div class="flex justify-between w-full border-b border-green-500/30 pb-2">
+    <section id="view-game" class="hidden flex flex-col items-center gap-6 w-full">
+        <div class="flex justify-center items-center gap-3 border-b border-green-500/30 pb-2">
             <button onclick="navigateTo('view-menu')" class="border border-green-500 px-3 py-1 text-xs font-mono text-green-500 hover:bg-green-500 hover:text-black transition">
-                &lt; MAIN_MENU
+                &gt; MAIN_MENU
             </button>
             <button onclick="selectDifficulty('easy');" class="easy-button border border-green-500 px-3 py-1 text-xs font-mono text-green-500 hover:bg-green-500 hover:text-black transition">
-                &lt; EASY
+                &gt; EASY
             </button>
             <button onclick="selectDifficulty('medium');" class="medium-button border border-green-500 px-3 py-1 text-xs font-mono text-green-500 hover:bg-green-500 hover:text-black transition">
-                &lt; MEDIUM
+                &gt; MEDIUM
             </button>
             <button onclick="selectDifficulty('hard');" class="hard-button border border-green-500 px-3 py-1 text-xs font-mono text-green-500 hover:bg-green-500 hover:text-black transition">
-                &lt; HARD
+                &gt; HARD
             </button>
         </div>
         <div id="board" class="grid gap-1 p-3 border-2 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)] bg-black select-none">
@@ -45,16 +48,37 @@
     </section>
 
     <!--Tela do Histórico de Jogos-->
-    <section id="view-history" class="hidden flex-col placeitems-center justify-center">
-        <pre id="ascii-title-history" class="text-green-500 bg-black pb-20 mt-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
+    <section id="view-history" class="hidden flex flex-col items-center justify-center">
+        <pre id="ascii-title-history" class="text-green-500 bg-black pb-10 mt-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
         
-        <div id="history-buttons" class="size-full max-w-6xl max-h-4xl flex flex-col place-items-center pb-4 opacity-0 transition-opacity duration-700">
-            <div class="w-full h-screen grid gap-6 shadow-[0_0_10px_rgba(34,197,94,0.5)] border-2 border-green-500">
-                <!--Últimos Jogos -->
+        <div id="history-buttons" class="w-full max-w-4xl flex flex-col items-center pb-4 opacity-0 transition-opacity duration-700">
+            <div class="w-full overflow-y-auto h-[600px] shadow-[0_0_10px_rgba(34,197,94,0.5)] border-2 border-green-500 bg-black">
+                <div class="grid gap-6">
+                    <!--Últimos Jogos -->
+                </div>
             </div>
             <div class="flex justify-between w-full text-xs font-mono text-green-600 px-1 py-4">
                 <button onclick="navigateTo('view-game'); selectDifficulty('easy');" class="hover:text-green-400 hover:underline">
-                    &gt; PLAY_DAILY_GAME
+                    &gt; PLAY_TODAY'S_GAME
+                </button>
+                <button onclick="navigateTo('view-menu')" class="hover:text-green-400 hover:underline">
+                    &gt; RETURN_TO_MENU
+                </button>
+            </div>
+        </div>
+    </section>
+
+<!-- Tela do Placar -->
+    <section id="view-leaderboard" class="hidden flex flex-col items-center justify-center">
+        <pre id="ascii-title-leaderboard" class="text-green-500 bg-black pb-10 mt-20 text-xs leading-none overflow-x-auto whitespace-pre select-none text-center"></pre>
+        
+        <div id="leaderboard-buttons" class="w-full max-w-2xl flex flex-col items-center pb-4 opacity-0 transition-opacity duration-700">
+            <div id="leaderboard-container" class="w-full min-h-[300px] max-h-[400px] p-4 shadow-[0_0_10px_rgba(34,197,94,0.5)] border-2 border-green-500 bg-black font-mono text-green-500 text-sm overflow-y-auto">
+            </div>
+
+            <div class="flex justify-between w-full text-xs font-mono text-green-600 px-1 py-4">
+                <button onclick="navigateTo('view-game'); selectDifficulty('easy');" class="hover:text-green-400 hover:underline">
+                    &gt; PLAY_TODAY'S_GAME
                 </button>
                 <button onclick="navigateTo('view-menu')" class="hover:text-green-400 hover:underline">
                     &gt; RETURN_TO_MENU
@@ -65,6 +89,7 @@
 
     <script src="./js/ascii.js"></script>
     <script src="./js/game.js"></script>
+    <script src="./js/score.js"></script>
     <script src="./js/router.js"></script>
 </body>
 </html>
