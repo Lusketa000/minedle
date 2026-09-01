@@ -40,11 +40,16 @@ function renderLeaderboard(scores) {
         const rank = index + 1;
         const rankClass = rank <= 3 ? 'text-green-300 font-bold' : 'text-green-500';
         
+        const timeInSeconds = parseFloat(item.tempoGasto || item.tempo_gasto || 0);
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = Math.floor(timeInSeconds % 60);
+        const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
         html += `
             <tr class="hover:bg-green-500/10 transition-colors ${rankClass}">
                 <td class="py-2 px-2">#${String(rank).padStart(2, '0')}</td>
                 <td class="py-2 px-2">${item.nome || 'ANONYMOUS'}</td>
-                <td class="py-2 px-2">${item.tempoGasto || item.tempo_gasto || 0}s</td>
+                <td class="py-2 px-2">${formattedTime}</td>
             </tr>
         `;
     });
