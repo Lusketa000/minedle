@@ -22,6 +22,12 @@ async function startNewGame(difficulty) {
     const scoreBox = document.getElementById('score-box');
     if (scoreBox) scoreBox.classList.add('hidden')
 
+    const msgElement = document.getElementById('game-message');
+    if (msgElement) {
+        msgElement.innerText = '';
+        msgElement.classList.add('hidden');
+    }
+
     const response = await fetch(`http://localhost:8080/api/board?difficulty=${difficulty}`);
     const data = await response.json();
 
@@ -32,11 +38,15 @@ async function startNewGame(difficulty) {
         row.map(cellValue => ({
             isMine: cellValue === 1,
             revealed: false,
+            neighborMines: 0,
+            isFlagged: false
         }))
     );
     
+    countNeighborMines(rows, cols, board);
     renderBoard();
 }
+
 
 // Função para lidar com a seleção de dificuldade
 function selectDifficulty(difficulty) {
@@ -110,19 +120,38 @@ function renderBoard() {
                 } else {
                     cell.className+= ' bg-green-900/60 text-green-300';
                 }
+
+                if (cellData.neighborMines > 0) {
+                    cell.innerText = cellData.neighborMines;
+
+                    const numberColors = ['', 'text-blue-400', 'text-green-400', 'text-red-400', 'text-purple-400', 'text-yellow-400'];
+                    cell.className += ` ${numberColors[cellData.neighborMines] || 'text-pink-400'}`;
+                }
             } else {
                 cell.className += ' bg-green-700/20 hover:bg-green-600/40 cursor-pointer';
-                cell.addEventListener('click', () => cellClickHandler(i, j));
-            }
 
+                if (cellData.isFlagged) {
+                    cell.innerText = '🚩';
+                }
+
+                cell.addEventListener('mousedown', (event) => {
+                    if (event.button === 0) {
+                        cellClickHandler(i, j, 'left');
+                    } else if (event.button === 2) {
+                        cellClickHandler(i, j, 'right');
+                    }
+                });
+                cell.addEventListener('contextmenu', (event) => event.preventDefault());
+            }
             boardContainer.appendChild(cell);
         }
     }
 }
 
 // Função para lidar com o clique em uma célula do tabuleiro
-function cellClickHandler(i, j) {
+function cellClickHandler(i, j, typeClick) {
     if (gameState === GAME_STATE.IDLE) {
+        if (typeClick === 'right') return;
         gameState = GAME_STATE.RUNNING;
         startTime = Date.now();
         startTimer();
@@ -133,16 +162,75 @@ function cellClickHandler(i, j) {
     const cell = board[i][j];
     if (cell.revealed) return;
 
+    if (typeClick === 'right') {
+        cell.isFlagged = !cell.isFlagged;
+        renderBoard();
+        return;
+    }
+
+    if (cell.isFlagged) return;
+
     cell.revealed = true;
 
     if (cell.isMine) {
-        // Para testes, por enquanto o jogador ganha se a célula for uma mina (trocar para false depois)
-        endGame(true);
+        endGame(false);
     } else {
-        // TODO: Implementar lógica para contar minas e revelar celulas adjacentes
+        revealAdjacentCells(i, j);
+        const victory = board.every(row => row.every(c => c.isMine || c.revealed));
+        if (victory) {
+            endGame(true);
+        }
     }
 
     renderBoard();
+}
+
+
+// Função para calcular o número de minas vizinhas
+function countNeighborMines(rows, cols, board) {
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            if (!board[i][j].isMine) {
+                let mineCount = 0;
+                for (let x = -1; x <= 1; x++) {
+                    for (let y = -1; y <= 1; y++) {
+                        const row = i + x;
+                        const col = j + y;
+
+                        if (row >= 0 && row < rows && col >= 0 && col < cols) {
+                            if (board[row][col].isMine) {
+                                mineCount++;
+                            }
+                        }
+                    }
+                }
+                board[i][j].neighborMines = mineCount;
+            }
+        }
+    }
+}
+
+
+// Função para revelar células adjacentes
+function revealAdjacentCells(i, j) {
+    const cell = board[i][j];
+    if (cell.neighborMines > 0) return;
+
+    for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+            const row = i + x;
+            const col = j + y;
+
+            if (row >= 0 && row < rows && col >= 0 && col < cols) {
+                const neighbor = board[row][col];
+
+                if (!neighbor.revealed && !neighbor.isMine && !neighbor.isFlagged) {
+                    neighbor.revealed = true;
+                    revealAdjacentCells(row, col);
+                }
+            }
+        }
+    }
 }
 
 
@@ -173,21 +261,43 @@ async function sendScore() {
     document.getElementById('score-box').classList.add('hidden');
     input.value = '';
 
+    const msgElement = document.getElementById('game-message');
+    if (msgElement) {
+        msgElement.innerText = '';
+        msgElement.classList.add('hidden');
+    }
+
     await saveScore(nome, finalTime);
 }
+
 
 // Função para finalizar o jogo
 function endGame(isVictory) {
     stopTimer();
     finalTime = Math.min(Math.floor((Date.now() - startTime) / 1000), 999.99);
+
+    const msgElement = document.getElementById('game-message');
+    const scoreBox = document.getElementById('score-box');
+
     if (!isVictory) {
         gameState = GAME_STATE.LOST;
-        return
+
+        if (msgElement) {
+            msgElement.innerText = "Game Over! You hit a mine.";
+            msgElement.className = "font-mono text-red-500 font-bold text-sm text-center";
+            msgElement.classList.remove('hidden');
+        }
+        return;
     }
 
     gameState = GAME_STATE.WON;
 
-    const scoreBox = document.getElementById('score-box');
+    if (msgElement) {
+        msgElement.innerText = `Congratulations! You won in ${String(Math.floor(finalTime / 60)).padStart(2, '0')}:${String(Math.floor(finalTime % 60)).padStart(2, '0')} minutes. Enter your name to save your score: `;
+        msgElement.className = "font-mono text-green-400 font-bold text-xs text-center max-w-xs";
+        msgElement.classList.remove('hidden');
+    }
+
     if (scoreBox) {
         scoreBox.classList.remove('hidden');
         document.getElementById('player-name').focus();
