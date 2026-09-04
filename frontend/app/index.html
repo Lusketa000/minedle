@@ -57,16 +57,18 @@
     <section id="view-history" class="hidden flex flex-col items-center justify-center">
         <pre id="ascii-title-history" class="text-green-500 bg-black pb-10 mt-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
         
-        <div id="history-buttons" class="w-full max-w-4xl flex flex-col items-center pb-4 opacity-0 transition-opacity duration-700">
+        <div id="history-buttons" class="w-full max-w-4xl flex flex-col items-center pb-4 transition-opacity duration-700">
             <div class="w-full overflow-y-auto h-[600px] shadow-[0_0_10px_rgba(34,197,94,0.5)] border-2 border-green-500 bg-black">
-                <div class="grid gap-6">
-                    <!--Últimos Jogos -->
+                <div id="history-list" class="grid gap-6 p-4">
+                    <!--Ultimos jogos-->
                 </div>
             </div>
             <div class="flex justify-between w-full text-xs font-mono text-green-600 px-1 py-4">
+                <!--
                 <button onclick="navigateTo('view-game'); selectDifficulty('easy');" class="hover:text-green-400 hover:underline">
                     &gt; PLAY_TODAY'S_GAME
                 </button>
+                -->
                 <button onclick="navigateTo('view-menu')" class="hover:text-green-400 hover:underline">
                     &gt; RETURN_TO_MENU
                 </button>
@@ -97,5 +99,6 @@
     <script src="./js/game.js"></script>
     <script src="./js/score.js"></script>
     <script src="./js/router.js"></script>
+    <script src="./js/history.js"></script>
 </body>
 </html>

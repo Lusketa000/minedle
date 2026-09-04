@@ -32,6 +32,34 @@ fastify.get('/api/board', async (request, reply) => {
     }
 });
 
+fastify.get('/api/board/:date', async (request, reply) => {
+    const date = request.params.date;
+    const difficulty = request.query.difficulty;
+
+    try {
+        const day = date;
+
+        const [seeds] = await fastify.mysql.query('SELECT seed FROM tabuleiros WHERE dia = ?', [day]);
+        
+        if (seeds.length === 0) {
+            const newSeed = Math.floor(Math.random() * 1000000);
+            await fastify.mysql.query('INSERT INTO tabuleiros (dia, seed) VALUES (?, ?)', [day, newSeed]);
+            seeds.push({ seed: newSeed });
+        }
+        const seed = seeds[0].seed;
+        
+        console.log(`Using seed: ${seed}`);
+        console.log(`Using difficulty: ${difficulty}`);
+        const board = generateBoard(seed, difficulty);
+
+        return board;
+    } catch (err) {
+        console.error(err);
+        reply.code(500).send({ error: 'Database query failed' })
+    }
+
+});
+
 fastify.get('/api/score', async (request, reply) => {
     const today = new Date().toISOString().split('T')[0];
     try {

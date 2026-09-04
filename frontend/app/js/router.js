@@ -16,9 +16,21 @@ function navigateTo(viewId) {
         typeWriter('ascii-title-menu', ASCII_ART.menu, 'menu-buttons');
     }
 
-    if (viewId === 'view-history' && typeof typeWriter === 'function') {
-        typeWriter('ascii-title-history', ASCII_ART.history, 'history-buttons');
+    if (viewId === 'view-history') {
+        const btnContainer = document.getElementById('history-buttons');
+        if (btnContainer) {
+            btnContainer.classList.remove('opacity-0');
+        }
+
+        if (typeof renderHistoryView === 'function') {
+            renderHistoryView();
+        }
+
+        if (typeof typeWriter === 'function') {
+            typeWriter('ascii-title-history', ASCII_ART.history, 'history-buttons');
+        }
     }
+
     if (viewId === 'view-leaderboard') {
         if (typeof loadLeaderboard === 'function') loadLeaderboard();
         if (typeof typeWriter === 'function') {
