@@ -30,6 +30,7 @@ function renderLeaderboard(scores) {
                 <tr class="border-b border-green-500/50 text-green-400">
                     <th class="py-2 px-2">RANK</th>
                     <th class="py-2 px-2">PLAYER</th>
+                    <th class="py-2 px-2">DIFFICULTY</th>
                     <th class="py-2 px-2">TIME</th>
                 </tr>
             </thead>
@@ -45,10 +46,14 @@ function renderLeaderboard(scores) {
         const seconds = Math.floor(timeInSeconds % 60);
         const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
+        const rawDiff = item.dificuldade || item.difficulty;
+        const difficulty = rawDiff ? String(rawDiff).toUpperCase() : 'EASY';
+
         html += `
             <tr class="hover:bg-green-500/10 transition-colors ${rankClass}">
                 <td class="py-2 px-2">#${String(rank).padStart(2, '0')}</td>
                 <td class="py-2 px-2">${item.nome || 'ANONYMOUS'}</td>
+                <td class="py-2 px-2 text-green-400/80 font-semibold">${difficulty}</td>
                 <td class="py-2 px-2">${formattedTime}</td>
             </tr>
         `;

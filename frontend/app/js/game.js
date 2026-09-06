@@ -11,6 +11,7 @@ let rows, cols;
 let startTime;
 let timerInterval = null;
 let finalTime = 0;
+let currentDifficulty = 'easy';
 
 // Função para iniciar um novo jogo com base na dificuldade escolhida
 async function startNewGame(difficulty) {    
@@ -49,6 +50,8 @@ async function startNewGame(difficulty) {
 
 // Função para lidar com a seleção de dificuldade
 function selectDifficulty(difficulty) {
+    currentDifficulty = difficulty; 
+
     document.querySelectorAll('.easy-button, .medium-button, .hard-button')
         .forEach(button => {
             button.classList.remove('bg-green-500', 'text-black');
@@ -230,7 +233,7 @@ async function saveScore(name, time) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            nome: name, tempo_gasto: time
+            nome: name, tempo_gasto: time, dificuldade: currentDifficulty
         })
     });
 
