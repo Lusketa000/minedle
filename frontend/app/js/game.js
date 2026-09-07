@@ -11,10 +11,15 @@ let rows, cols;
 let startTime;
 let timerInterval = null;
 let finalTime = 0;
+
+let currentDate = null;
 let currentDifficulty = 'easy';
 
 // Função para iniciar um novo jogo com base na dificuldade escolhida
-async function startNewGame(difficulty) {    
+async function loadGame(date, difficulty) {   
+    currentDate = date
+    currentDifficulty = difficulty;
+    
     const boardContainer = document.getElementById('board');
     stopTimer();
     updateTimerDisplay(0);
@@ -29,23 +34,42 @@ async function startNewGame(difficulty) {
         msgElement.classList.add('hidden');
     }
 
-    const response = await fetch(`/api/board?difficulty=${difficulty}`);
-    const data = await response.json();
+    const url = currentDate
+        ? `/api/board/${currentDate}?difficulty=${difficulty}`
+        : `/api/board?difficulty=${difficulty}`;
 
-    rows = data.length;
-    cols = data[0].length;
+    try {
+        const response = await fetch(url);
+        if(!response.ok) throw new Error('Falha ao obter o tabuleiro');
 
-    board = data.map(row => 
-        row.map(cellValue => ({
-            isMine: cellValue === 1,
-            revealed: false,
-            neighborMines: 0,
-            isFlagged: false
-        }))
-    );
-    
-    countNeighborMines(rows, cols, board);
-    renderBoard();
+        const data = await response.json();
+
+        rows = data.length;
+        cols = data[0].length;
+
+        board = data.map(row => 
+            row.map(cellValue => ({
+                isMine: cellValue === 1,
+                revealed: false,
+                neighborMines: 0,
+                isFlagged: false
+            }))
+        );
+        
+        countNeighborMines(rows, cols, board);
+        renderBoard();
+    } catch (err) {
+        console.error('Erro ao carregar o jogo:', err);
+    }
+}
+
+// Função para carregar o tabuleiro da data escolhida no histórico
+async function loadBoardByDate(dateString) {
+    currentDate = dateString;
+    if (typeof navigateTo === 'function') {
+        navigateTo('view-game');
+    }
+    selectDifficulty('easy');
 }
 
 // Função para lidar com a seleção de dificuldade
@@ -64,8 +88,12 @@ function selectDifficulty(difficulty) {
         selectedButton.classList.remove('text-green-500');
     }
     
-    startNewGame(difficulty);
+    loadGame(currentDate, currentDifficulty);
 }
+
+
+
+
 
 // Função para iniciar o timer do jogo
 function startTimer() {
@@ -93,6 +121,10 @@ function updateTimerDisplay(seconds) {
         timerElement.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
 }
+
+
+
+
 
 // Função para renderizar o tabuleiro do jogo
 function renderBoard() {
@@ -225,6 +257,10 @@ function revealAdjacentCells(i, j) {
     }
 }
 
+
+
+
+
 // Função para salvar o score
 async function saveScore(name, time) {
     const response = await fetch('http://localhost:8080/api/score', {
@@ -287,50 +323,5 @@ function endGame(isVictory) {
     if (scoreBox) {
         scoreBox.classList.remove('hidden');
         document.getElementById('player-name').focus();
-    }
-}
-
-// Função para carregar o tabuleiro da data escolhida no histórico
-async function loadBoardByDate(dateString, difficulty = 'easy') {
-    stopTimer();
-    updateTimerDisplay(0);
-    gameState = GAME_STATE.IDLE;
-
-    const scoreBox = document.getElementById('score-box');
-    if (scoreBox) scoreBox.classList.add('hidden');
-
-    const msgElement = document.getElementById('game-message');
-    if (msgElement) {
-        msgElement.innerText = '';
-        msgElement.classList.add('hidden');
-    }
-
-    try {
-        const response = await fetch(`/api/board/${dateString}?difficulty=${difficulty}`);
-        if (!response.ok) throw new Error('Falha ao obter o tabuleiro do dia');
-
-        const data = await response.json();
-
-        rows = data.length;
-        cols = data[0].length;
-
-        board = data.map(row => 
-            row.map(cellValue => ({
-                isMine: cellValue === 1,
-                revealed: false,
-                neighborMines: 0,
-                isFlagged: false
-            }))
-        );
-        
-        countNeighborMines(rows, cols, board);
-
-        if (typeof navigateTo === 'function') {
-            navigateTo('view-game');
-        }
-
-        renderBoard();
-    } catch (err) {
-        console.error(`Erro ao carregar o jogo da data ${dateString}:`, err);
     }
 }

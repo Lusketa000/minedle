@@ -41,7 +41,7 @@ function renderHistoryView() {
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <button onclick="event.stopPropagation(); loadBoardByDate('${item.rawDate}')" 
                             class="flex-1 md:flex-none px-3 py-1 text-xs font-mono text-green-500 transition whitespace-nowrap">
-                        &gt; PLAY_THIS_DAY
+                        &gt; PLAY
                     </button>
                 </div>
             </div>

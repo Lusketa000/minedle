@@ -12,7 +12,7 @@
         <pre id="ascii-title-menu" class="text-green-500 bg-black pb-20 text-xs leading-none overflow-x-auto whitespace-pre select-none"></pre>
 
         <div id="menu-buttons" class="flex flex-col gap-10 place-items-center opacity-0 transition-opacity duration-700">
-            <button onclick="navigateTo('view-game'); selectDifficulty('easy');" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider 
+            <button onclick="currentDate = null; navigateTo('view-game'); selectDifficulty('easy');" class="font-mono text-green-500 bg-black border-2 border-green-500 px-4 py-2 font-bold uppercase tracking-wider 
                         shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all hover:bg-green-500 hover:text-black active:translate-y-0.5 focus:outline-none">
                     [ START GAME ]
             </button>
@@ -45,10 +45,10 @@
         <div class="flex justify-between items-center w-full max-w-xs font-mono text-sm border border-green-500/40 px-3 py-1 bg-black/60 shadow-[0_0_8px_rgba(34,197,94,0.2)]">
             <span class="text-green-600">&gt; TIME: <span id="game-timer" class="text-green-400 font-bold">00:00</span></span>
         </div>
-        <div id="board" class="grid gap-1 p-3 border-2 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)] bg-black select-none"></div>
+        <div id="board" oncontextmenu="return false;"class="grid gap-1 p-3 border-2 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)] bg-black select-none"></div>
         <p id="game-message" class="hidden font-mono text-center"></p>
         <div id="score-box" class="hidden flex gap-2">
-            <input id="player-name" type="text" placeholder="YOUR NAME" class="bg-black border border-green-500 text-green-400 px-2 py-1 font-mono text-sm outline-none">
+            <input id="player-name" type="text" placeholder="YOUR NAME" onkeypress="if(event.key === 'Enter') sendScore()" class="bg-black border border-green-500 text-green-400 px-2 py-1 font-mono text-sm outline-none">
             <button onclick="sendScore()" class="bg-green-500 text-black font-bold px-3 py-1 font-mono text-sm">[ SAVE ]</button>
         </div>
     </section>
@@ -59,16 +59,9 @@
         
         <div id="history-buttons" class="w-full max-w-4xl flex flex-col items-center pb-4 transition-opacity duration-700">
             <div class="w-full overflow-y-auto h-[600px] shadow-[0_0_10px_rgba(34,197,94,0.5)] border-2 border-green-500 bg-black">
-                <div id="history-list" class="grid gap-6 p-4">
-                    <!--Ultimos jogos-->
-                </div>
+                <div id="history-list" class="grid gap-6 p-4"></div>
             </div>
             <div class="flex justify-between w-full text-xs font-mono text-green-600 px-1 py-4">
-                <!--
-                <button onclick="navigateTo('view-game'); selectDifficulty('easy');" class="hover:text-green-400 hover:underline">
-                    &gt; PLAY_TODAY'S_GAME
-                </button>
-                -->
                 <button onclick="navigateTo('view-menu')" class="hover:text-green-400 hover:underline">
                     &gt; RETURN_TO_MENU
                 </button>
@@ -85,7 +78,7 @@
             </div>
 
             <div class="flex justify-between w-full text-xs font-mono text-green-600 px-1 py-4">
-                <button onclick="navigateTo('view-game'); selectDifficulty('easy');" class="hover:text-green-400 hover:underline">
+                <button onclick="currentDate = null; navigateTo('view-game'); selectDifficulty('easy');" class="hover:text-green-400 hover:underline">
                     &gt; PLAY_TODAY'S_GAME
                 </button>
                 <button onclick="navigateTo('view-menu')" class="hover:text-green-400 hover:underline">
