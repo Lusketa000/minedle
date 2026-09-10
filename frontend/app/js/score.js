@@ -5,7 +5,7 @@ async function loadLeaderboard() {
     container.innerHTML = '<div class="text-green-500 animate-pulse text-center font-mono">&gt; FETCHING_HIGH_SCORES...</div>';
 
     try {
-        const response = await fetch('http://localhost:8080/api/score');
+        const response = await fetch('http://localhost/api/score');
         if (!response.ok) throw new Error('SERVER_ERROR');
 
         const scores = await response.json();

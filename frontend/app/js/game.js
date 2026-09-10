@@ -263,7 +263,7 @@ function revealAdjacentCells(i, j) {
 
 // Função para salvar o score
 async function saveScore(name, time) {
-    const response = await fetch('http://localhost:8080/api/score', {
+    const response = await fetch('http://localhost/api/score', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
