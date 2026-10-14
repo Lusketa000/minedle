@@ -15,6 +15,7 @@ Vagrant.configure("2") do |config|
             end
         client.vm.provision "shell", inline: <<-SHELL
             apt-get update
+            apt-get install -y curl
             apt-get install -y nginx
 
             cp /vagrant/reverse-proxy/nginx/nginx.conf \
@@ -30,6 +31,8 @@ Vagrant.configure("2") do |config|
             nginx -t
             systemctl enable nginx
             systemctl restart nginx
+
+            bash /vagrant/scripts/install-node-exporter.sh
         SHELL
     end
 
@@ -47,6 +50,7 @@ Vagrant.configure("2") do |config|
             end
         client.vm.provision "shell", inline: <<-SHELL
             apt-get update
+            apt-get install -y curl
             apt-get install -y nginx
 
             # Frontend
@@ -67,6 +71,8 @@ Vagrant.configure("2") do |config|
             nginx -t
             systemctl enable nginx
             systemctl restart nginx
+
+            bash /vagrant/scripts/install-node-exporter.sh
         SHELL
     end
 
@@ -102,6 +108,7 @@ Vagrant.configure("2") do |config|
             systemctl enable backend
             systemctl restart backend
 
+            bash /vagrant/scripts/install-node-exporter.sh
         SHELL
     end
 
@@ -119,6 +126,7 @@ Vagrant.configure("2") do |config|
             end
         client.vm.provision "shell", inline: <<-SHELL
             apt-get -y update
+            apt-get install -y curl
             apt-get install -y net-tools mysql-server
             sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf
             systemctl restart mysql
@@ -130,6 +138,111 @@ Vagrant.configure("2") do |config|
                 echo "sql não encontrado"
             fi
 
+            bash /vagrant/scripts/install-node-exporter.sh
+        SHELL
+    end
+
+    config.vm.define "prometheus" do |client|
+        client.vm.box = "ubuntu/focal64"
+        client.vm.hostname = "prometheus"
+
+        client.vm.network "private_network",
+            ip: "10.20.30.5",
+            netmask: "255.255.255.0",
+            virtualbox__intnet: "intnet1"
+
+        # Acesso à interface pelo computador host
+        client.vm.network "forwarded_port",
+            guest: 9090,
+            host: 9090,
+            host_ip: "127.0.0.1"
+
+        client.vm.provider "virtualbox" do |vb|
+            vb.customize ["modifyvm", :id, "--ioapic", "on"]
+            vb.customize ["modifyvm", :id, "--paravirt-provider", "hyperv"]
+            vb.gui = true
+            vb.memory = "1024"
+            vb.cpus = 1
+            vb.name = "prometheus"
+        end
+
+        client.vm.provision "shell", inline: <<-SHELL
+            set -e
+
+            apt-get update
+            apt-get install -y curl tar
+
+            # Usuário e diretórios
+            id -u prometheus >/dev/null 2>&1 || useradd --no-create-home --shell /usr/sbin/nologin prometheus
+
+            mkdir -p /etc/prometheus /var/lib/prometheus
+
+            # Baixar o Prometheus
+            VERSION="2.55.1"
+            cd /tmp
+
+            curl -fsSLO "https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-amd64.tar.gz"
+
+            tar -xzf "prometheus-${VERSION}.linux-amd64.tar.gz"
+
+            cd "prometheus-${VERSION}.linux-amd64"
+
+            install prometheus /usr/local/bin/prometheus
+            install promtool /usr/local/bin/promtool
+
+            # Copiar as configurações do Prometheus
+            cp /vagrant/prometheus/prometheus.yml /etc/prometheus/prometheus.yml
+            cp /vagrant/prometheus/alert_rules.yml /etc/prometheus/alert_rules.yml
+            cp /vagrant/prometheus/systemd/prometheus.service /etc/systemd/system/prometheus.service
+
+            # Permissões
+            chown -R prometheus:prometheus /etc/prometheus /var/lib/prometheus
+
+            # Validar a configuração e iniciar
+            /usr/local/bin/promtool check config /etc/prometheus/prometheus.yml
+
+            systemctl daemon-reload
+            systemctl enable --now prometheus
+
+            # Instalar Node Exporter também nesta VM
+            bash /vagrant/scripts/install-node-exporter.sh
+        SHELL
+    end
+
+    config.vm.define "grafana" do |grafana|
+        grafana.vm.box = "ubuntu/focal64"
+        grafana.vm.hostname = "grafana"
+
+        grafana.vm.network "private_network",
+            ip: "10.20.30.6",
+            virtualbox__intnet: "intnet1"
+
+        grafana.vm.network "forwarded_port",
+            guest: 3000,
+            host: 3000,
+            host_ip: "127.0.0.1"
+
+        grafana.vm.provider "virtualbox" do |vb|
+            vb.name = "grafana"
+            vb.memory = 1024
+            vb.cpus = 1
+            vb.gui = true
+        end
+
+        grafana.vm.provision "shell", inline: <<-SHELL
+            apt-get update
+            apt-get install -y apt-transport-https wget gpg
+
+            mkdir -p /etc/apt/keyrings
+            wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor --yes -o /etc/apt/keyrings/grafana.gpg
+
+            echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" > /etc/apt/sources.list.d/grafana.list
+
+            apt-get update
+            apt-get install -y grafana
+
+            systemctl enable grafana-server
+            systemctl start grafana-server
         SHELL
     end
 end

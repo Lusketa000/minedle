@@ -1,0 +1,65 @@
+groups:
+  - name: vm-availability
+    rules:
+      - alert: InstanceDown
+        expr: up{job="node"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "VM indisponível: {{ $labels.vm }}"
+          description: "O Prometheus não consegue coletar métricas do Node Exporter desta VM há pelo menos 30 segundos."
+
+  - name: vm-resource-usage
+    rules:
+      - alert: HighCPU
+        expr: |
+          100 * (
+            1 - avg by (vm, instance) (
+              rate(node_cpu_seconds_total{job="node", mode="idle"}[1m])
+            )
+          ) > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Uso elevado de CPU: {{ $labels.vm }}"
+          description: "O uso de CPU está acima de 80% há pelo menos 2 minutos."
+
+      - alert: HighMemory
+        expr: |
+          100 * (
+            1 - (
+              node_memory_MemAvailable_bytes{job="node"}
+              /
+              node_memory_MemTotal_bytes{job="node"}
+            )
+          ) > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Uso elevado de memória: {{ $labels.vm }}"
+          description: "A utilização de memória está acima de 85% há pelo menos 2 minutos."
+
+      - alert: LowDiskSpace
+        expr: |
+          100 * (
+            node_filesystem_avail_bytes{
+              job="node",
+              mountpoint="/",
+              fstype!~"tmpfs|overlay"
+            }
+            /
+            node_filesystem_size_bytes{
+              job="node",
+              mountpoint="/",
+              fstype!~"tmpfs|overlay"
+            }
+          ) < 15
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pouco espaço em disco: {{ $labels.vm }}"
+          description: "Restam menos de 15% de espaço disponível no sistema de arquivos raiz há pelo menos 2 minutos."
