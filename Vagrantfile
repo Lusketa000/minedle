@@ -193,6 +193,7 @@ Vagrant.configure("2") do |config|
             # Copiar as configurações do Prometheus
             cp /vagrant/prometheus/prometheus.yml /etc/prometheus/prometheus.yml
             cp /vagrant/prometheus/alert_rules.yml /etc/prometheus/alert_rules.yml
+            cp /vagrant/prometheus/recording_rules.yml /etc/prometheus/recording_rules.yml
             cp /vagrant/prometheus/systemd/prometheus.service /etc/systemd/system/prometheus.service
 
             # Permissões
@@ -202,7 +203,8 @@ Vagrant.configure("2") do |config|
             /usr/local/bin/promtool check config /etc/prometheus/prometheus.yml
 
             systemctl daemon-reload
-            systemctl enable --now prometheus
+            systemctl enable prometheus
+            systemctl restart prometheus
 
             # Instalar Node Exporter também nesta VM
             bash /vagrant/scripts/install-node-exporter.sh

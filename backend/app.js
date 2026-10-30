@@ -97,6 +97,42 @@ fastify.post('/api/score', async (request, reply) => {
     }
 });
 
+fastify.get('/api/completions', async (request, reply) => {
+    const today = new Date().toISOString().split('T')[0];
+    try {
+        const [tabuleiros] = await fastify.mysql.query('SELECT id FROM tabuleiros WHERE dia = ?', [today]);
+        if (tabuleiros.length === 0) {
+            return 0;
+        }
+        const tabuleiro_id = tabuleiros[0].id;
+
+        const completions = await fastify.mysql.query('COUNT(*) AS completions FROM placares WHERE tabuleiros_id = ?', [tabuleiro_id]);
+        return completions;
+    }
+    catch (err) {
+        console.error(err);
+        reply.code(500).send({ error: 'Database query failed' })
+    }
+});
+
+fastify.get('/api/best-time', async (request, reply) => {
+    const today = new Date().toISOString().split('T')[0];
+    try {
+        const [tabuleiros] = await fastify.mysql.query('SELECT id FROM tabuleiros WHERE dia = ?', [today]);
+        if (tabuleiros.length === 0) {
+            return 0;
+        }
+        const tabuleiro_id = tabuleiros[0].id;
+
+        const bestTime = await fastify.mysql.query('SELECT MIN(tempo_gasto) AS best_time FROM placares WHERE tabuleiros_id = ?', [tabuleiro_id]);
+        return bestTime[0];
+    }
+    catch (err) {
+        console.error(err);
+        reply.code(500).send({ error: 'Database query failed' })
+    }
+});
+
 function mulberry32(a) {
     return function() {
       let t = a += 0x6D2B79F5;

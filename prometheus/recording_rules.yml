@@ -1,0 +1,45 @@
+groups:
+  - name: vm-recording-rules
+    interval: 30s
+    rules:
+      - record: vm:cpu_usage_percent
+        expr: |
+          100 * (
+            1 - avg by (vm) (
+              rate(node_cpu_seconds_total{job="node", mode="idle"}[1m])
+            )
+          )
+
+      - record: vm:memory_usage_percent
+        expr: |
+          100 * (
+            1 -
+            node_memory_MemAvailable_bytes{job="node"}
+            /
+            node_memory_MemTotal_bytes{job="node"}
+          )
+
+      - record: vm:disk_free_percent
+        expr: |
+          100 * (
+            node_filesystem_avail_bytes{
+              job="node",
+              mountpoint="/",
+              fstype!~"tmpfs|overlay"
+            }
+            /
+            node_filesystem_size_bytes{
+              job="node",
+              mountpoint="/",
+              fstype!~"tmpfs|overlay"
+            }
+          )
+
+      - record: vm:network_receive_bits_per_second
+        expr: |
+          sum by (vm) (
+            rate(node_network_receive_bytes_total{
+              job="node",
+              device!~"lo|docker.*|veth.*"
+            }[1m])
+          ) * 8
