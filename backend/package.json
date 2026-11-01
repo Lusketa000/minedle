@@ -4,6 +4,7 @@
   "main": "app.js",
   "dependencies": {
     "fastify": "4.26.0",
-    "@fastify/mysql": "4.3.0"
+    "@fastify/mysql": "4.3.0",
+    "prom-client": "15.1.3"
   }
 }

@@ -1,4 +1,14 @@
 const fastify = require('fastify')({logger: true});
+const client = require('prom-client');
+
+const completionsMetric = new client.Gauge({
+  name: 'minedle_daily_completions',
+  help: 'Number of scores submitted for the current Minedle board.'
+});
+const bestTimeMetric = new client.Gauge({
+  name: 'minedle_daily_best_time_seconds',
+  help: 'Best completion time for the current Minedle board, in seconds.'
+});
 
 fastify.register(require('@fastify/mysql'), {
   promise: true,
@@ -97,39 +107,27 @@ fastify.post('/api/score', async (request, reply) => {
     }
 });
 
-fastify.get('/api/completions', async (request, reply) => {
+fastify.get('/metrics', async (request, reply) => {
     const today = new Date().toISOString().split('T')[0];
+
     try {
-        const [tabuleiros] = await fastify.mysql.query('SELECT id FROM tabuleiros WHERE dia = ?', [today]);
-        if (tabuleiros.length === 0) {
-            return 0;
-        }
-        const tabuleiro_id = tabuleiros[0].id;
+        const [rows] = await fastify.mysql.query(
+            `SELECT COUNT(p.id) AS completions, MIN(p.tempo_gasto) AS best_time
+             FROM tabuleiros t
+             LEFT JOIN placares p ON p.tabuleiros_id = t.id
+             WHERE t.dia = ?`,
+            [today]
+        );
 
-        const completions = await fastify.mysql.query('COUNT(*) AS completions FROM placares WHERE tabuleiros_id = ?', [tabuleiro_id]);
-        return completions;
-    }
-    catch (err) {
-        console.error(err);
-        reply.code(500).send({ error: 'Database query failed' })
-    }
-});
+        const metrics = rows[0];
+        completionsMetric.set(Number(metrics.completions));
+        bestTimeMetric.set(metrics.best_time === null ? 0 : Number(metrics.best_time));
 
-fastify.get('/api/best-time', async (request, reply) => {
-    const today = new Date().toISOString().split('T')[0];
-    try {
-        const [tabuleiros] = await fastify.mysql.query('SELECT id FROM tabuleiros WHERE dia = ?', [today]);
-        if (tabuleiros.length === 0) {
-            return 0;
-        }
-        const tabuleiro_id = tabuleiros[0].id;
-
-        const bestTime = await fastify.mysql.query('SELECT MIN(tempo_gasto) AS best_time FROM placares WHERE tabuleiros_id = ?', [tabuleiro_id]);
-        return bestTime[0];
-    }
-    catch (err) {
-        console.error(err);
-        reply.code(500).send({ error: 'Database query failed' })
+        reply.type(client.register.contentType);
+        return client.register.metrics();
+    } catch (err) {
+        request.log.error(err, 'Could not collect application metrics');
+        return reply.code(500).send({ error: 'Could not collect application metrics' });
     }
 });
 
